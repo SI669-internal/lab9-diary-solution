@@ -1,13 +1,16 @@
 <ion-header>
   <ion-navbar>
-    <ion-title (click)="go()">
-      Trapper Keeper
+    <ion-title>
+      My Diary
     </ion-title>
   </ion-navbar>
 </ion-header>
 
 <ion-content padding>
   <ion-list>
+    <ion-item>
+      <button ion-button full (click)="addEntry()">Add Entry</button>
+    </ion-item>
     <ion-item *ngFor="let entry of entries">
       <ion-label>
         <h2>{{entry.title}}</h2>

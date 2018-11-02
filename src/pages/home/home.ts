@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
 import { EntryDetailPage } from '../entry-detail/entry-detail';
+import { Entry } from '../../models/entry';
+import { EntryDataServiceProvider } from '../../providers/entry-data-service/entry-data-service';
 
 @Component({
   selector: 'page-home',
@@ -8,29 +10,23 @@ import { EntryDetailPage } from '../entry-detail/entry-detail';
 })
 export class HomePage {
 
-  private entries: any[] = [];
+  private entries: Entry[] = [];
 
-  constructor(public navCtrl: NavController) {
-    let fakeEntries = [
-      {
-        title: "Latest Entry",
-        text: "Today I went to my favorite class, SI 669. It was super great."
-      },
-      {
-        title: "Earlier Entry",
-        text: "I can't wait for Halloween! I'm going to eat so much candy!!!"
-      },
-      {
-        title: "First Entry",
-        text: "OMG Project 1 was the absolute suck!"
-      }
-    ];
-
-    this.entries = fakeEntries;
-
+  constructor(public navCtrl: NavController, private entryService: EntryDataServiceProvider) {
+    this.entryService.getObservable().subscribe(update => {
+      this.entries = entryService.getEntries();
+    });
+    
+    this.entries = entryService.getEntries();
   }
 
-  go() {
+  // public ionViewWillEnter() {
+  //   this.entries = this.entryService.getEntries();
+  // }
+
+  private addEntry() {
+    console.log("In the View");
+    console.log(this.entries);
     this.navCtrl.push(EntryDetailPage);
   }
 }
