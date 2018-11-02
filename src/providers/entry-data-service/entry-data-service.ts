@@ -9,6 +9,7 @@ export class EntryDataServiceProvider {
   private entries: Entry[] = [];
   private serviceObserver: Observer<Entry[]>;
   private clientObservable: Observable<Entry[]>;
+  private nextID: number = 0;
 
   constructor(  ) { 
     let foo;
@@ -32,22 +33,40 @@ export class EntryDataServiceProvider {
   }
 
   public addEntry(entry:Entry) {
+    entry.id = this.getUniqueID();
     this.entries.push(entry);
     this.notifySubscribers();
 //    console.log("Added an entry, the list is now: ", this.entries);
   }
 
+  private getUniqueID(): number {
+    return this.nextID++;
+  }
+
+  public getEntryByID(id: number): Entry {
+    for (let e of this.entries) {
+      if (e.id === id) {
+        let clone = JSON.parse(JSON.stringify(e));
+        return clone;
+      }
+    }
+    return undefined;
+  }
+
   private loadFakeEntries() {
     this.entries = [
       {
+        id: this.getUniqueID(),
         title: "Latest Entry",
         text: "Today I went to my favorite class, SI 669. It was super great."
       },
       {
+        id: this.getUniqueID(),
         title: "Earlier Entry",
         text: "I can't wait for Halloween! I'm going to eat so much candy!!!"
       },
       {
+        id: this.getUniqueID(),
         title: "First Entry",
         text: "OMG Project 1 was the absolute suck!"
       }
