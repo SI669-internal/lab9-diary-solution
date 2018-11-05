@@ -27,13 +27,16 @@ export class HomePage {
   // }
 
   private addEntry() {
-    console.log("In the View");
-    console.log(this.entries);
     this.navCtrl.push(EntryDetailPage);
   }
 
   private editEntry(entryID: number) {
     console.log("editing entry ", entryID);
     this.navCtrl.push(EntryDetailPage, {"entryID": entryID});
+  }
+
+  private deleteEntry(entryID: number) {
+    console.log("deleting entry", entryID);
+    this.entryService.removeEntry(entryID);
   }
 }
