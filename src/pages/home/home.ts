@@ -30,9 +30,7 @@ export class HomePage {
     this.entries = entryService.getEntries();
   }
 
-  // public ionViewWillEnter() {
-  //   this.entries = this.entryService.getEntries();
-  // }
+
 
   private addEntry() {
     this.navCtrl.push(EntryDetailPage);
