@@ -20,8 +20,11 @@
         <h2>{{entry.title}}</h2>
       </ion-label>
       <ion-label (click)="editEntry(entry.id)">
-        <p>{{entry.text}}</p>
+        <p class="small">{{entry.text}}</p>
       </ion-label>
-    </ion-item>
+      <ion-label (click)="editEntry(entry.id)">
+        <p class="small">{{entry.timestamp | date:'short'}}</p>
+      </ion-label>
+      </ion-item>
   </ion-list>
 </ion-content>

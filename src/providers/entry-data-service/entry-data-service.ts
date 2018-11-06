@@ -12,29 +12,40 @@ export class EntryDataServiceProvider {
   private serviceObserver: Observer<Entry[]>;
   private clientObservable: Observable<Entry[]>;
   private nextID: number = 0;
+  private reset: boolean = false;
 
   constructor(private storage: Storage ) { 
     this.loadFakeEntries();
     this.clientObservable = Observable.create(observerThatWasCreated => {
       this.serviceObserver = observerThatWasCreated;
     });
-
-    this.storage.get("myDiaryEntries").then(data => {
-      if (data != undefined && data != null) {
-        this.entries = JSON.parse(data);
+    if (!this.reset) {
+      this.storage.get("myDiaryEntries").then(data => {
+        if (data != undefined && data != null) {
+          this.entries = JSON.parse(data);
+          this.notifySubscribers();
+        }
+      }, err => {
+        console.log(err);
+      });
+      this.storage.get("nextID").then(data => {
+        if (data != undefined && data != null) {
+          this.nextID = data;
+          console.log("got nextID: ", this.nextID);
+        }
+      }, err => {
+        console.log(err);
+      })
+    } else { // resetting all the data
+      this.storage.clear().then(() => {
+        this.loadFakeEntries();
+        this.getUniqueID(); // force save of new uniqueID
+        this.saveData(); // force save of fake entries
         this.notifySubscribers();
-      }
-    }, err => {
-      console.log(err);
-    });
-    this.storage.get("nextID").then(data => {
-      if (data != undefined && data != null) {
-        this.nextID = data;
-        console.log("got nextID: ", this.nextID);
-      }
-    }, err => {
-      console.log(err);
-    })
+      }, err => {
+        console.log(err);
+      });
+    }
   }
 
   public getObservable(): Observable<Entry[]> {
@@ -47,11 +58,13 @@ export class EntryDataServiceProvider {
 
   public getEntries():Entry[] {
     let entriesClone = JSON.parse(JSON.stringify(this.entries));
+    console.log("Someone got my entries! They got: ", entriesClone);
     return entriesClone;
   }
 
   public addEntry(entry:Entry) {
     entry.id = this.getUniqueID();
+    //entry.timestamp = new Date();
     this.entries.push(entry);
     this.notifySubscribers();
     this.saveData();
@@ -74,9 +87,11 @@ export class EntryDataServiceProvider {
   }
 
   public updateEntry(id: number, newEntry: Entry): void {
-    let entryToUpdate: Entry = this.findEntryByID(id); // we'll need to write this
+    let entryToUpdate: Entry = this.findEntryByID(id); 
     entryToUpdate.title = newEntry.title;
     entryToUpdate.text = newEntry.text;
+    entryToUpdate.timestamp = newEntry.timestamp;
+    console.log("In service, updating entry: ", entryToUpdate);
     this.notifySubscribers();
     this.saveData();
   }
@@ -112,17 +127,20 @@ export class EntryDataServiceProvider {
       {
         id: this.getUniqueID(),
         title: "Latest Entry",
-        text: "Today I went to my favorite class, SI 669. It was super great."
+        text: "Today I went to my favorite class, SI 669. It was super great.",
+        timestamp: new Date()
       },
       {
         id: this.getUniqueID(),
         title: "Earlier Entry",
-        text: "I can't wait for Halloween! I'm going to eat so much candy!!!"
+        text: "I can't wait for Halloween! I'm going to eat so much candy!!!",
+        timestamp: new Date()
       },
       {
         id: this.getUniqueID(),
         title: "First Entry",
-        text: "OMG Project 1 was the absolute suck!"
+        text: "OMG Project 1 was the absolute suck!",
+        timestamp: new Date()
       }
     ];
   }

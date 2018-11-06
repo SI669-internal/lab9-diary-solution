@@ -14,8 +14,16 @@ export class HomePage {
 
   constructor(public navCtrl: NavController, 
       private entryService: EntryDataServiceProvider) {
-    this.entryService.getObservable().subscribe(update => {
+    this.entryService.getObservable().subscribe(() => {
       this.entries = entryService.getEntries();
+      for (let e of this.entries) {
+        if (typeof e.timestamp === 'string') {
+          e.timestamp = new Date(e.timestamp);
+        }
+      }
+      this.entries.sort((a:Entry, b:Entry) => {
+        return (a.timestamp.getTime() - b.timestamp.getTime());
+      }).reverse();
       console.log(this.entries);
     });
     
